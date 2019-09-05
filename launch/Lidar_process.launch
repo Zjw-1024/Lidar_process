@@ -1,0 +1,11 @@
+<launch>
+
+  <node pkg="Lidar_process" type="main_node" name="main_node" output="screen"/>
+
+  <node name="playbag" pkg="rosbag" type="play"
+        args="/home/zhang/Lidar_ws/data/2019-09-04-13-48-34.bag" />
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d /home/zhang/Lidar_ws/src/Lidar_process/rviz/Lidar_process.rviz" />
+
+
+</launch>
