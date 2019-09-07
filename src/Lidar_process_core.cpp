@@ -5,9 +5,9 @@ LidarProcessCore::LidarProcessCore(ros::NodeHandle &nh)
     //ros::Subscriber sub = nh.subscribe("/velodyne_points", 10, Lidar_Callback);
     ros::Subscriber sub = nh.subscribe("/point_raw", 10, &LidarProcessCore::Lidar_Callback,this);  
 
-    cloud_filtered_pub = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 3);
-    obstCloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/obstCloud", 3);
-    planeCloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/planeCloud", 3);
+    cloud_filtered_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 3);
+    obstCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/obstCloud", 3);
+    planeCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/planeCloud", 3);
     ros::spin();
 }
 
@@ -168,7 +168,7 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
 
   sensor_msgs::PointCloud2 cloud_filtered_out;
   pcl::toROSMsg(*cloud_filtered,cloud_filtered_out);
-  cloud_filtered_pub.publish (cloud_filtered_out); 
+  cloud_filtered_pub_.publish (cloud_filtered_out); 
 
   //segmentation process
   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::Ptr> segment
@@ -183,7 +183,7 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
   pcl::toROSMsg(*segment.first,obstCloud_out);
   pcl::toROSMsg(*segment.second,planeCloud_out);
 
-  obstCloud_pub.publish(obstCloud_out);
-  planeCloud_pub.publish(planeCloud_out);
+  obstCloud_pub_.publish(obstCloud_out);
+  planeCloud_pub_.publish(planeCloud_out);
 
 }

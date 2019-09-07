@@ -15,9 +15,9 @@ class LidarProcessCore
 {
 private:
 
-    ros::Publisher cloud_filtered_pub;
-    ros::Publisher obstCloud_pub;
-    ros::Publisher planeCloud_pub;
+    ros::Publisher cloud_filtered_pub_;
+    ros::Publisher obstCloud_pub_;
+    ros::Publisher planeCloud_pub_;
 
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::Ptr> 
         SeparateClouds(pcl::PointIndices::Ptr inliers, pcl::PointCloud<pcl::PointXYZI>::Ptr cloud);
