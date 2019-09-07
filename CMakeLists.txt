@@ -39,5 +39,5 @@ catkin_package(
   INCLUDE_DIRS include
 )
 
-add_executable(main_node src/main.cpp)
+add_executable(main_node src/main.cpp  src/Lidar_process_core.cpp)
 target_link_libraries(main_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
