@@ -2,8 +2,11 @@
 
 LidarProcessCore::LidarProcessCore(ros::NodeHandle &nh)
 {
-    //ros::Subscriber sub = nh.subscribe("/velodyne_points", 10, Lidar_Callback);
-    ros::Subscriber sub = nh.subscribe("/point_raw", 10, &LidarProcessCore::Lidar_Callback,this);  
+
+    std::string lidar_topic;
+    ros::param::get("lidar_topic", lidar_topic);
+     //ros::Subscriber sub = nh.subscribe("/velodyne_points", 10, Lidar_Callback);
+    ros::Subscriber sub = nh.subscribe(lidar_topic, 10, &LidarProcessCore::Lidar_Callback,this);  
 
     cloud_filtered_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 3);
     obstCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/obstCloud", 3);
@@ -36,7 +39,10 @@ std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::
 
 pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCloud<pcl::PointXYZI>::Ptr cloudinput)
 {
-    auto startTime = std::chrono::steady_clock::now();
+  auto startTime = std::chrono::steady_clock::now();
+  
+  double leaf_size;
+  ros::param::get("lidar_topic", leaf_size);
  
   //pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_in {new pcl::PointCloud<pcl::PointXYZI>};
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_final {new pcl::PointCloud<pcl::PointXYZI>};
@@ -50,7 +56,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
 
   pcl::VoxelGrid<pcl::PointXYZI> sor; 
   sor.setInputCloud (cloudinput);     
-  sor.setLeafSize (0.05, 0.05, 0.05);
+  sor.setLeafSize (leaf_size, leaf_size, leaf_size);
   sor.filter(*cloud_VG_filtered); 
 
   pcl::CropBox<pcl::PointXYZI> region(true);
@@ -59,29 +65,31 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
   region.setInputCloud(cloud_VG_filtered);
   region.filter(*cloud_CB_filtered);
 
-  std::vector<int> indices;
+//   std::vector<int> indices;
 
-  pcl::CropBox<pcl::PointXYZI> roof(true);
-  roof.setMin(Eigen::Vector4f(-1.5,-1.7,-1,1));
-  roof.setMax(Eigen::Vector4f(2.6,1.7,-0.4,1));
-  roof.setInputCloud(cloud_CB_filtered);
-  roof.filter(indices);
+//   pcl::CropBox<pcl::PointXYZI> roof(true);
+//   roof.setMin(Eigen::Vector4f(-1.5,-1.7,-1,1));
+//   roof.setMax(Eigen::Vector4f(2.6,1.7,-0.4,1));
+//   roof.setInputCloud(cloud_CB_filtered);
+//   roof.filter(indices);
 
-  pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
-  for(int point:indices)
-      inliers->indices.push_back(point);
-  pcl::ExtractIndices<pcl::PointXYZI> extract;
-  extract.setInputCloud(cloud_CB_filtered);
-  extract.setIndices(inliers);
-  extract.setNegative(true);
-  extract.filter(*cloud_final);
+//   pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
+//   for(int point:indices)
+//       inliers->indices.push_back(point);
+//   pcl::ExtractIndices<pcl::PointXYZI> extract;
+//   extract.setInputCloud(cloud_CB_filtered);
+//   extract.setIndices(inliers);
+//   extract.setNegative(true);
+//   extract.filter(*cloud_final);
 
   auto endTime = std::chrono::steady_clock::now();
   auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 
   ROS_INFO("filtering took %ld milliseconds",elapsedTime.count() );
 
-  return cloud_final;
+  //return cloud_final;
+  return cloud_CB_filtered;
+
 
 }
 
@@ -185,5 +193,4 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
 
   obstCloud_pub_.publish(obstCloud_out);
   planeCloud_pub_.publish(planeCloud_out);
-
 }
