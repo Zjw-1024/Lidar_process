@@ -6,11 +6,11 @@ LidarProcessCore::LidarProcessCore(ros::NodeHandle &nh)
     std::string lidar_topic;
     ros::param::get("lidar_topic", lidar_topic);
      //ros::Subscriber sub = nh.subscribe("/velodyne_points", 10, Lidar_Callback);
-    ros::Subscriber sub = nh.subscribe(lidar_topic, 10, &LidarProcessCore::Lidar_Callback,this);  
+    ros::Subscriber sub = nh.subscribe(lidar_topic, 5, &LidarProcessCore::Lidar_Callback,this);  
 
     cloud_filtered_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points", 3);
     obstCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/obstCloud", 3);
-    planeCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/planeCloud", 3);
+    //planeCloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/planeCloud", 3);
     ros::spin();
 }
 
@@ -42,7 +42,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
   auto startTime = std::chrono::steady_clock::now();
   
   double leaf_size;
-  ros::param::get("lidar_topic", leaf_size);
+  ros::param::get("leaf_size", leaf_size);
  
   //pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_in {new pcl::PointCloud<pcl::PointXYZI>};
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_final {new pcl::PointCloud<pcl::PointXYZI>};
@@ -65,22 +65,22 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
   region.setInputCloud(cloud_VG_filtered);
   region.filter(*cloud_CB_filtered);
 
-//   std::vector<int> indices;
+  // std::vector<int> indices;
 
-//   pcl::CropBox<pcl::PointXYZI> roof(true);
-//   roof.setMin(Eigen::Vector4f(-1.5,-1.7,-1,1));
-//   roof.setMax(Eigen::Vector4f(2.6,1.7,-0.4,1));
-//   roof.setInputCloud(cloud_CB_filtered);
-//   roof.filter(indices);
+  // pcl::CropBox<pcl::PointXYZI> roof(true);
+  // roof.setMin(Eigen::Vector4f(-1.5,-1.7,-1,1));
+  // roof.setMax(Eigen::Vector4f(2.6,1.7,-0.4,1));
+  // roof.setInputCloud(cloud_CB_filtered);
+  // roof.filter(indices);
 
-//   pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
-//   for(int point:indices)
-//       inliers->indices.push_back(point);
-//   pcl::ExtractIndices<pcl::PointXYZI> extract;
-//   extract.setInputCloud(cloud_CB_filtered);
-//   extract.setIndices(inliers);
-//   extract.setNegative(true);
-//   extract.filter(*cloud_final);
+  // pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
+  // for(int point:indices)
+  //     inliers->indices.push_back(point);
+  // pcl::ExtractIndices<pcl::PointXYZI> extract;
+  // extract.setInputCloud(cloud_CB_filtered);
+  // extract.setIndices(inliers);
+  // extract.setNegative(true);
+  // extract.filter(*cloud_final);
 
   auto endTime = std::chrono::steady_clock::now();
   auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
@@ -96,13 +96,13 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
 std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::Ptr> 
     LidarProcessCore::SegmentPlane(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud, int maxIterations, float distanceThreshold)
 {
-    ROS_INFO("segmentation process");
+  ROS_INFO("segmentation process");
     // Time segmentation process
-    auto startTime = std::chrono::steady_clock::now();
+  auto startTime = std::chrono::steady_clock::now();
     // TODO:: Fill in this function to find inliers for the cloud.
 
-    std::unordered_set<int> inlierResult;
-    for(int i=0;i<maxIterations;++i)
+  std::unordered_set<int> inlierResult;
+  for(int i=0;i<maxIterations;++i)
 	{
 		// Randomly sample subset and fit line
 		int first;
@@ -145,22 +145,22 @@ std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::
 		    inlierResult = inlier;
 	}
 
-    pcl::PointIndices::Ptr inliers (new pcl::PointIndices());
-    for(int tmp : inlierResult)
-        inliers->indices.push_back(tmp);
-    if(inliers->indices.size()==0)
-    {
-        ROS_WARN("could not estimate a planar model for the given dataset.");
-    }
+  pcl::PointIndices::Ptr inliers (new pcl::PointIndices());
+  for(int tmp : inlierResult)
+    inliers->indices.push_back(tmp);
+  if(inliers->indices.size()==0)
+  {
+    ROS_WARN("could not estimate a planar model for the given dataset.");
+  }
 
-    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> 
-      segResult = SeparateClouds(inliers,cloud);
+  std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> 
+    segResult = SeparateClouds(inliers,cloud);
 
-    auto endTime = std::chrono::steady_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-    ROS_INFO("plane segmentation took %ld milliseconds",elapsedTime.count());
+  auto endTime = std::chrono::steady_clock::now();
+  auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+  ROS_INFO("plane segmentation took %ld milliseconds",elapsedTime.count());
 
-    return segResult;
+  return segResult;
 }
 
 void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& input)
@@ -171,12 +171,15 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_filtered {new pcl::PointCloud<pcl::PointXYZI>};
 
   pcl::fromROSMsg(*input,*cloud_in);
+  ROS_INFO("cloud_in count: %ld",cloud_in->points.size());
+
   //filter process
   cloud_filtered = Cloud_filter(cloud_in);
+  ROS_INFO("cloud_filtered count: %ld",cloud_filtered->points.size());
 
   sensor_msgs::PointCloud2 cloud_filtered_out;
   pcl::toROSMsg(*cloud_filtered,cloud_filtered_out);
-  cloud_filtered_pub_.publish (cloud_filtered_out); 
+  cloud_filtered_pub_.publish(cloud_filtered_out); 
 
   //segmentation process
   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::Ptr> segment

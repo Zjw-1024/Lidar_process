@@ -6,20 +6,13 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  nav_msgs
   sensor_msgs
   roscpp
-  rospy
   rosbag
   std_msgs
-  image_transport
-  cv_bridge
-  tf
 )
 
 find_package(Eigen3 REQUIRED)
-find_package(OpenCV REQUIRED)
 find_package(Ceres REQUIRED)
 
 find_package(PCL REQUIRED)
@@ -34,7 +27,7 @@ include_directories(
   )
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy std_msgs
+  CATKIN_DEPENDS  roscpp  std_msgs
   DEPENDS EIGEN3 PCL
   INCLUDE_DIRS include
 )
