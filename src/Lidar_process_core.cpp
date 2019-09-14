@@ -189,11 +189,11 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
   ROS_INFO("planeCloud count %ld",segment.second->size());
 
   sensor_msgs::PointCloud2 obstCloud_out;
-  sensor_msgs::PointCloud2 planeCloud_out;
+  //sensor_msgs::PointCloud2 planeCloud_out;
 
   pcl::toROSMsg(*segment.first,obstCloud_out);
-  pcl::toROSMsg(*segment.second,planeCloud_out);
+  //pcl::toROSMsg(*segment.second,planeCloud_out);
 
   obstCloud_pub_.publish(obstCloud_out);
-  planeCloud_pub_.publish(planeCloud_out);
+  //planeCloud_pub_.publish(planeCloud_out);
 }
