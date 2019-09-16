@@ -1,2 +1,2 @@
-注意launch文件中路径为绝对路径
-
+clone Lidar_process　euclidean_cluster
+运行Lidar_process/launch中的Lidar_detection.launch
