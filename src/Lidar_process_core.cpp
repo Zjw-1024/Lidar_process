@@ -60,8 +60,8 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
   sor.filter(*cloud_VG_filtered); 
 
   pcl::CropBox<pcl::PointXYZI> region(true);
-  region.setMin(Eigen::Vector4f (0, -10, -0.5, 1));
-  region.setMax(Eigen::Vector4f (100, 10, 2, 1));
+  region.setMin(Eigen::Vector4f (0, -5, -0.5, 1));
+  region.setMax(Eigen::Vector4f (100, 8, 2, 1));
   region.setInputCloud(cloud_VG_filtered);
   region.filter(*cloud_CB_filtered);
 
