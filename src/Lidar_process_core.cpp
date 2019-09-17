@@ -141,7 +141,8 @@ std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::
 			}
 		}
 		// If distance is smaller than threshold count it as inlier
-		if(inlier.size()>inlierResult.size())
+    // 加地面约束条件判断
+		if(inlier.size()>inlierResult.size() && c/a > 5 && c/b > 5)
 		    inlierResult = inlier;
 	}
 
