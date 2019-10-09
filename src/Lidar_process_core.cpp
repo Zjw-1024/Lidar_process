@@ -60,7 +60,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr LidarProcessCore::Cloud_filter(pcl::PointCl
   sor.filter(*cloud_VG_filtered); 
 
   pcl::CropBox<pcl::PointXYZI> region(true);
-  region.setMin(Eigen::Vector4f (0, -5, -0.5, 1));
+  region.setMin(Eigen::Vector4f (0, -5, -0.6, 1));
   region.setMax(Eigen::Vector4f (100, 8, 2, 1));
   region.setInputCloud(cloud_VG_filtered);
   region.filter(*cloud_CB_filtered);
@@ -184,7 +184,7 @@ void LidarProcessCore::Lidar_Callback(const sensor_msgs::PointCloud2ConstPtr& in
 
   //segmentation process
   std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr,pcl::PointCloud<pcl::PointXYZI>::Ptr> segment
-      = SegmentPlane(cloud_filtered,1000,0.2);
+      = SegmentPlane(cloud_filtered,1000,0.20);
   
   ROS_INFO("obstCloud count %ld",segment.first->size());
   ROS_INFO("planeCloud count %ld",segment.second->size());
