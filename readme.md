@@ -1,2 +1,2 @@
-clone Lidar_process　euclidean_cluster
-运行Lidar_process/launch中的Lidar_detection.launch
+clone Lidar_process 
+运行Lidar_process/launch中的lidar_detection.launch
