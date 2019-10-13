@@ -49,6 +49,6 @@
     <node name="playbag" pkg="rosbag" type="play"
         args=" /home/zhang/Lidar_ws/data/1.bag" /> 
 
-    <node pkg="rviz" type="rviz" name="rviz" args="-d /home/zhang/Lidar_ws/Lidar_detection.rviz" />
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find Lidar_process)/rviz/Lidar_process.rviz" />
 
 </launch>
