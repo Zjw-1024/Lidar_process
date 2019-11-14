@@ -9,3 +9,4 @@
 2.run 
 
     roslaunch Lidar_process lidar_process.launch
+    
